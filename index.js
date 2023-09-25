@@ -402,6 +402,7 @@ if (isMobileDevice()) {
   
   document.getElementById("input-li").style.marginLeft = "5px"
   document.getElementById("chat").style.paddingBottom = "176px"
+  document.getElementById("suggested-questions").style.bottom = "66px"
 
 } else {
   // This code will run on desktop devices
