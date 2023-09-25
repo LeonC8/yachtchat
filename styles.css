@@ -58,13 +58,14 @@ html, body {
 
 
 #chat {
-    position:absolute;
+    position:fixed;
     top: 0px;
+    left: 0px;
     padding-top: 25px;
     width: 100%;
     overflow: scroll;
     padding-bottom: 120px;
-    height: 100%;
+    height: 100vh;
     padding-top: 89px;
     max-width: 450px;
      
