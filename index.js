@@ -399,7 +399,7 @@ function isMobileDevice() {
 
 if (isMobileDevice()) {
   // This code will run on mobile devices
-  document.getElementById("suggested-questions").style.bottom = "66px"
+  
   document.getElementById("input-li").style.marginLeft = "5px"
 
 } else {
