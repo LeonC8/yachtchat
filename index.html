@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenAI Fetch API</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://kit.fontawesome.com/40beadb774.js" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+
+</head>
+<body>
+   
+    <script type="module" src="index.js"></script>
+
+   <div id = "widget" class = "card">
+        <div id = "header">
+            <li class="list-group-item py-2" style="border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.19); display: flex; align-items: center;;">
+
+                <img src="yc4.avif" id="logo" style="display: inline;">
+                <div>
+                    <h1 id="name" style="display: inline;font-weight: 600">YachtChat</h1>
+                    <p id = "response-time-msg">Typically responds in under 10 seconds</p>
+                </div>
+               
+                <svg id ="refresh-svg" xmlns="http://www.w3.org/2000/svg" height="1em" style="margin-left:auto;margin-right: 10px;height: 20px;opacity: 88.5%" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M142.9 142.9c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8H463.5c0 0 0 0 0 0H472c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5c7.7-21.8 20.2-42.3 37.8-59.8zM16 312v7.6 .7V440c0 9.7 5.8 18.5 14.8 22.2s19.3 1.7 26.2-5.2l41.6-41.6c87.6 86.5 228.7 86.2 315.8-1c24.4-24.4 42.1-53.1 52.9-83.7c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.2 62.2-162.7 62.5-225.3 1L185 329c6.9-6.9 8.9-17.2 5.2-26.2s-12.5-14.8-22.2-14.8H48.4h-.7H40c-13.3 0-24 10.7-24 24z"/></svg>
+              </li>
+              
+        </div>
+        <div id = "chat">
+            <div class = "ai-msg">Hello, what yacht are you looking for?</div>
+              <div class = "user-msg">Im looking for a Princess V53, do you have one available? </div>
+            <div class = "ai-msg">Great choice! Yes we have one available. </div>
+            
+            
+            <div class='card yacht-card' style='width: 13rem;'> 
+                <img class='card-img-top yacht-image' src='https://boatsector.com/wp-content/uploads/2021/10/8076952_0_201020211935_1-db78ea43.jpg' > 
+                <div class='card-body'> 
+                    <h5 class='card-title'>Princess V53</h5> 
+                    <p class='card-text'>Powered by twin MAN-450 engines, this yacht is located in Croatia and available immediately.</p> 
+                    <a href='#' class='btn btn-primary see-more-btn'>See more </a> 
+                </div> 
+            </div>
+       
+            <div class = "user-msg">What is the year of this yacht?</div>
+        <div class = "ai-msg">It is a model from 2004, but this particular yacht was manufactured in 2007. </div>
+        <div class = "ai-msg">It is priced at 350.000€, what is your current budget range? </div>
+        <div class = "user-msg">Im more so looking for something between 200 and 300k.</div>
+        <div class = "ai-msg">In that case, you might want to have at our Fairline Phantom 46 priced at 270.000€. </div>
+        <div class='card yacht-card' style='width: 13rem;'> 
+            <img class='card-img-top yacht-image' src='https://images.boatsgroup.com/resize/1/39/79/7333979_20200117025226903_1_XLARGE.jpg' > 
+            <div class='card-body'> 
+                <h5 class='card-title'>Fairline Phantom 46</h5> 
+                <p class='card-text'>Powered by twin VOLVO-500 engines, this yacht is located in Croatia and available immediately.</p> 
+                <a href='#' class='btn btn-primary see-more-btn'>See more </a> 
+            </div> 
+        </div>
+        <div class = "ai-msg">Would you like to learn more, or do you have some other yacht brands you prefer? </div>
+        <div class = "user-msg">Please give me who to contact about this boat.</div> 
+ 
+        </div>
+        
+
+    </div>
+
+    
+</body>
+</html>
+
+
+
+
+<div id = "footer" style="display: flex;justify-content: space-between;padding-bottom: 0px;align-items: flex-end;">
+    <div id = "suggested-questions" >
+        <span class = "suggested-question " id = "first-question">Fairline between 300 and 400k€?</span>
+        <span class = "suggested-question" id = "second-question">Princess yacht below 13 meter?</span>
+        <span class = "suggested-question" id = "third-question">Galeon 430?</span>   
+    </div>
+    <li class="list-group-item py-1   ms-0 mb-0" id = "input-li" style="margin-right: 10px;background-color: rgba(255, 255, 255, 0.166);  border-radius: 15px;border: 1px solid rgba(0, 0, 0, 0.173);display: flex; align-items: center;width: 100%;padding-left: 10px;margin-left: 0px;transform: translateY(-15px);"><input type="text" placeholder="Ask me anything.." id = "msg-input">  </li> 
+    <div id = "send-icon-container" style="transform: translateY(-15px)"> <svg xmlns="http://www.w3.org/2000/svg" height=".85em" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#fafafa}</style><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg> </div>
+</div>
+   
