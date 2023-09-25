@@ -401,6 +401,7 @@ if (isMobileDevice()) {
   // This code will run on mobile devices
   
   document.getElementById("input-li").style.marginLeft = "5px"
+  document.getElementById("chat").style.paddingBottom = "175px"
 
 } else {
   // This code will run on desktop devices
