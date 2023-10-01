@@ -10,12 +10,14 @@ html, body {
 #widget {
     height:100%;
     width: 100%;
-        display: flex;
+        display:flex;
         flex-direction: column;
         height: 100vh; /* Make the container fill the viewport height */
-    max-width: 450px;
-    left: 50%;
-    transform: translate(-50%);
+    max-width: 800px;
+    right: 0%;
+    position: fixed;
+    bottom: 0;
+    
 }
 
 #header {
@@ -29,7 +31,11 @@ html, body {
     transform: translateY(-5px);
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.173);
+    border: 1px solid rgba(0, 0, 0, 0.173);
+    position:fixed;
+top: 0;
+max-width: 800px;
+
     
 }
 
@@ -42,8 +48,8 @@ html, body {
 #footer {
     position:fixed;
     bottom: 0; /* Adjust for the safe area at the bottom */
-    left:0px;
-    height: 120px;
+    right: 0px;
+    height: 145px;
     text-align: left;
     width: 100%;
     background: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
@@ -53,23 +59,23 @@ html, body {
     border: 1px solid rgba(0, 0, 0, 0.161);
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
-    max-width: 450px;
+    max-width: 800px;
     z-index: 5;
 
 }
 
 
+
 #chat {
     position:fixed;
     top: 0px;
-    left: 0px;
     padding-top: 25px;
     width: 100%;
     overflow: scroll;
-    padding-bottom: 123px;
+    padding-bottom: 150px;
     height: 100vh;
     padding-top: 89px;
-    max-width: 450px;
+    max-width: 800px;
     scrollbar-width: none; /* Hide the scrollbar in Firefox */
     -ms-overflow-style: none; /* Hide the scrollbar in IE/Edge */
      
@@ -90,7 +96,7 @@ html, body {
     padding: 10px;
     padding-right: 15px;
     padding-left: 15px;
-    margin-left: 13px;
+    margin-left: 16px;
     clear:both;
     margin-bottom:7px;
     z-index: 1;
@@ -111,7 +117,7 @@ html, body {
     padding: 10px;
     padding-right: 15px;
     padding-left: 15px;
-    margin-right: 5px;
+    margin-right: 6px;
 }
 
 
@@ -138,7 +144,8 @@ html, body {
     font-size: 11px;
     opacity: 80%;
     margin: 0;
-    margin-bottom: 2.5px
+    margin-bottom: 2.5px;
+    margin-right: 25px;
 }
 
 #msg-input {
@@ -167,9 +174,9 @@ button:focus {
 
 
 .yacht-card {
-    margin-left: 13px !important;
+    margin-left: 16px !important;
     margin-bottom: 5px;
-    border-radius: 15px;
+    border-radius: 16px;
     background-color: rgb(241, 241, 240);
     border:none;
     float:left;
@@ -197,7 +204,9 @@ button:focus {
 
 .card-text {
     margin-bottom: 12px;
-    opacity: 85%
+    opacity: 85%;
+    display:flex;
+    align-items: center;
 }
 
 .see-more-btn {
@@ -215,12 +224,16 @@ button:focus {
 }
 
 #send-icon-container {
+    height: 36px;
+    width: 36px;
     display: flex;align-items: center;margin-right: 12px;background-color:rgb(0, 123, 255);padding: 10px;border-radius: 50%;padding-left: 12px;padding-right: 12px
 }
 
-#refresh-svg {
-    fill: rgba(0, 0, 0, 0.887)
+#send-icon-container:hover {
+    cursor: pointer;
 }
+
+
 
 
 
@@ -270,14 +283,32 @@ button:focus {
     bottom: 47px;
     width: 100%;
     max-width: 450px;
-    padding-left: 5px;
+    padding-left: 5px !important;
     padding-right: 10px;
     padding-top: 20px;
     padding-bottom: 10px;
     scrollbar-width: none; /* Hide the scrollbar in Firefox */
     -ms-overflow-style: none; /* Hide the scrollbar in IE/Edge */
-    
+    max-width: 790px !important;
 }
+
+.simplebar-content {
+    padding-left: 0px !important;
+    max-width: 450px !important;
+    margin-right: 30px !important
+}
+
+#suggested-questions-headline {
+    padding-bottom: 15px;
+    padding-left: 8px;
+    position:absolute;
+
+    bottom: 97px;
+;
+}
+
+
+
 
 
 
@@ -288,27 +319,23 @@ button:focus {
 
 .suggested-question {
     background-color: rgba(241, 241, 240, 0.25);
-    margin-right: 10px;
+    margin-left: 0px; margin-right: 8px;
     padding: 10px;
     padding-left: 13px;
     padding-right: 13px;
     font-size: 13px;
     border-radius: 15px;
     z-index: 5;
-    border:1px solid rgba(0, 0, 0, 0.12);
+    border:1px solid rgba(0, 0, 0, 0.2);
     color: rgba(0, 0, 0, 0.92)
 }
 
-@media (min-width: 501px) {
-    #footer {
-        left: 50%;
-        transform: translate(-50%); /* Center the element by translating it back by half of its own width and height */
-    }
+.suggested-question:hover {
+    cursor: pointer;
+}
 
-    #suggested-questions {
-        left: 50%;
-        transform: translate(-50%); /* Center the element by translating it back by half of its own width and height */
-    }
+@media (min-width: 501px) {
+   
 
     #suggested-questions{
 
@@ -316,14 +343,64 @@ button:focus {
 
      }
 
-     #input-li {
-        margin-left: 2px !important
-     }
+   
 
     
      }
     
 
+     
+     @media (min-width: 800px) { 
+
+        #opener-div {
+            width: 100px !important
+        }
+
+        
+.suggested-question  {
+    margin-left: 5px; margin-right: 4px;
+}
+
+        #header {
+            right: 0px !important;
+            top: 50px;
+            right: 25px !important;
+            bottom: 0px;
+            transform: translate(0px, 0px) !important;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            max-width: 450px !important;
+        }
+        
+        #widget {
+            position: fixed;
+            border-radius: 15px !important;
+            height: calc(100vh - 135px);
+            right: 25px !important;
+            bottom: 85px;
+            transform: translate(0px, 0px) !important;
+            max-width: 450px !important;
+            
+        }
+
+        #chat {
+            border-radius: 15px !important;
+            height: 100% !important;
+            max-width: 450px !important;
+        }
+        #footer {
+           right: 25px !important;
+           border-bottom-left-radius: 15px;
+           border-bottom-right-radius: 15px;
+           bottom: 85px;
+           max-width: 450px !important;
+        }
+
+        #suggested-questions {
+            max-width: 440px !important;
+        }
+
+     }
 
 
 input {
@@ -340,3 +417,13 @@ p {
 .simplebar-scrollbar {
     opacity: 50%;
   }
+
+
+  .small-dot {
+    font-size: 8px;
+    margin-bottom: 2.5px;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+ 

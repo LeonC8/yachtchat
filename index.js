@@ -1,6 +1,41 @@
+const model = "gpt-3.5-turbo-16k"
+
+const systemPrompt = `You are a helpful chatbot assistant on a yacht listing website. Anwser short. 
+Always try to anwser as short as possible. 
+Only provide the necessary information. 
+Prioritize rendering a visual image over writing more text. 
+You will answer questions that customers ask about the yachts on our platform. 
+For each question, I will give you the needed data taken from our database. 
+If you get no data provided, just say: 'Im sorry, but it seems like we do not have a yacht with those features available.' 
+If you think it is appropriate, you should render the image of the yacht or yachts in an html card. 
+You do this by providing me with a list of attributes that I use to render the card. 
+The template for the list is: [{imageUrl(taken from mainImg attribute in JSON)}, {yacht_name}, {price}, {year}]
+ Do not render the card and image any other way then with this template list. 
+ Anwser very concise. 
+ Anwser with a list of JSON objects. Only anwser with the list of JSON objects and never anythign else. 
+ This is the template for your anwser: '[{\"type\": 'text', \"content\": 'some content'}, {\"type\": 'html', "imgUrl": 'url', "title": 'title', "price": 'price', "year": 'year'}, {\"type\": 'text', content: 'some content'}, ...]'
+  Every single time at the end of the list, add another list with 3 suggested next questions for the user. 
+  Do not forget to add these suggested questions in a list. These 3 questions will be rendered to the user as "suggested next questions".
+  Aim to only provide questions that you think you can give an anwser to from the data provided or that you can fetch new data from your vector database to anwser the question. (the data provided is data that is fetched from a a vector database with similarity search and metadata filtering, where each chunk is one yacht JSON object)
+  The template is: {\"type\": 'suggested', \"content\": [question1, question2, question3]}  Add exactly 3 of them. Do not forget to close the last object with '}'. 
+  If you are adding an object with suggested anwsers, the type MUST be 'suggested'. 
+  Do not say anything before or after! Never deviate from the JSON template. 
+  Never forget to wrap the message objects in a list. 
+  You can only put html and text object types one after another, like it is a conversation. 
+  Keep in mind, all of the text and and html objects have to then once again be wrapped in one big list. 
+  When you are rendering cards, each card must be in its seperate JSON object. 
+  You must be very careful to only output text that can be parsed correctly with the JSON.parse() method from javascript.
+   Do not put any characters before or after the list brackets and do not put any characters inside of the brackets that will ruin the structure of the JSON list. 
+   I will later parse this in my code with JSON.parse() and I do not want errors to occurr. 
+   Do not put single qoutes before or after the list. The first character that you write must be '['. 
+ Imagine that each new text object is a new message.
+  Never render only card, always also write some text. 
+If the question is not related to yachts, say you do not know anything.
+ Make each individual message as short as possible.  
+ Be very careful to emphasise when you are suggesting a yacht from another manufacturer or model than the requested one.
+  Focus on what brand and model the user is looking for, and do not suggest other yachts (even if provided in the data) ' `
 
 
-const systemPrompt = "You are a helpful chatbot assistant on a yacht listing website. Anwser short. Always try to anwser as short as possible. Only provide the necessary information. Prioritize rendering a visual image over writing more text. You will answer questions that customers ask about the yachts on our platform. For each question, I will give you the needed data taken from our database. The data will be in JSON format like, for example:\n\n{'yacht_name': 'Pershing  80', 'year': 2010, 'generator': true, 'make': 'Pershing ', 'sternThruster': true, 'taxPaid': true, 'airConditioning': true, 'propulsionType': 'Inboard', 'city': '', 'dealershipEmail': 'info@masternautika.com', 'engines': 'MTU 2400hp', 'radar': true, 'active': true, 'size': 23.98, 'fuelCapacity': 5950, 'postal_code': '', 'autopilot': true, 'heads': 3, 'folderName': '1692612104874Pershing  80', 'mainImg': 'https://firebasestorage.googleapis.com/v0/b/approved-boats.appspot.com/o/FLPZtlEmRlZwKNvtW18GJm1UQex2%2F1692612104874Pershing%20%2080%2FmainImg%2F1692612104874-8469815_20220830051948626_1_XLARGE.jpg?alt=media&token=1facb507-30f3-4f80-b573-c9cf5875e019', 'description': '2010 Pershing 80\nPershing 80 from 2010 from her first owner!\nYacht is regularly maintained and in very good condition; used only by the owner.\nLow engine and generator hours\nLayout of 3 cabins and office work space instead of 4th cabin.\nContact us for more information and to arrange a viewing.', 'dealershipName': 'Master Nautika', 'gps': true, 'hydraulicPasarelle': true, 'fuelType': 'Diesel', 'bowThruster': true, 'model': '80', 'price': 2450000, 'beam': 5.5, 'solarPanel': false, 'satTv': false, 'teakCockpit': true, 'country': 'Croatia', 'new': false} If you think it is appropriate, you should render the image of the yacht or yachts in an html card. You do this by providing me with html code that renders the card. The html template is: <div class='card yacht-card' style='width: 13rem;'> <img class='card-img-top yacht-image' src='...' > <div class='card-body'> <h5 class='card-title'>Card title</h5> <p class='card-text'> {price in euros} • {year} </p> <a href='#' class='btn btn-primary see-more-btn'>See more </a> </div> </div>. Do not render the card and image any other way then with this template html code. Anwser very concise. Anwser with a list of JSON objects. Only anwser with the list of JSON objects and never anythign else. This is the template for your anwser: '[{\"type\": 'text', \"content\": 'some content'}, {\"type\": 'html', content: 'some  html code'}, {\"type\": 'text', content: 'some content'}, ...]' Every single time at the end of the list, add another list with 3 suggested next questions for the user. Do not forget to add these suggested anwsers in a list. The template is: {\"type\": 'suggested', \"content\": ['Tell me more about the Cranchi Z35', 'What are the specifications of the Cranchi Z35?'', 'Do you have any other yachts available?']  Add exactly 3 of them. If you are adding an object with suggested anwsers, the type MUST be 'suggested'. Do not say anything before or after! Never deviate from the JSON template. Never forget to wrap the message objects in a list. You can only put html and text object types one after another, like it is a conversation. Keep in mind, all of the text and and html objects have to then once again be wrapped in one big list. When you are rendering cards, each card must be in its seperate html JSON object. You must be very careful to only output text that can be parsed correctly with the JSON.parse() method from javascript. Do not put any characters before or after the list brackets and do not put any characters inside of the brackets that will ruin the structure of the JSON list. I will later parse this in my code with JSON.parse() and I do not want errors to occurr. Do not put single qoutes before or after the list. The first character that you write must be '['. Do not put any backslashes before qoutes. NEVER put backslashes before quotes, just write normal. Imagine that each new text object is a new message. Never render only card, always also write some text. You will be given some data each and every time, but the data will not always be neccesary for your next anwser (sometimes the previous data will be sufficient, for example if the user is asking a follow up question about a boat). In cases like this, give an anwser that the user is expecting, because the user does not see the data that you were provided, it only sees the rendred messages. If the data provided is for a new boat, but the question is a follow up question to the previously discussed boat, anwser the question for the old boat and ignore the new one. Never use the backslash character ('\'). The backslash character will ruin my app so do not use it. When rendering attributes inside of html elements, only use single quotes, do not use double qoutes. If the question is not related to yachts, say you do not know anything. Make each individual message as short as possible. If you receive data about a yacht that is not exactly in the parameters that the user asked for, say 'We currently do not have a yacht that fully matches your inquiry, but here is a good alternative.' Be very careful to emphasise when you are suggesting a yacht from another manufacturer or model than the requested one. ' "
 
 function removeQuotesAndBackticksIfExist(inputString) {
 
@@ -21,7 +56,7 @@ function removeQuotesAndBackticksIfExist(inputString) {
   }
 
 const API_KEY = 'a636c203-e59e-4d56-a1d8-e884ac4baf5b';
-const OPENAI_API_KEY = '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'; // Replace with your actual API key
+const OPENAI_API_KEY = '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'; // Replace with your actual API key
 let vector = [];
 
 var history = [{
@@ -33,7 +68,7 @@ var history = [{
 async function fetchOpenAIRequest(query) {
   const requestBody = {
     input: query,
-    model: "text-embedding-ada-002"
+    model: "text-embedding-ada-002",
   };
 
   try {
@@ -57,11 +92,11 @@ async function fetchOpenAIRequest(query) {
 }
 
 // Function to make the Pinecone request
-async function fetchPineconeRequest(metadataFilters) {
+async function fetchPineconeRequest(metadataFilters, topK) {
   // Define the query parameters
   const queryParameters = {
     vector: vector,
-    topK: 3,
+    topK: topK,
     includeValues: true,
     includeMetadata: true,
     filter: metadataFilters
@@ -91,9 +126,11 @@ async function fetchPineconeRequest(metadataFilters) {
   }
 }
 
-async function callOpenAIChatCompletion(userMessage) {
+async function callOpenAIChatCompletion(userMessage, originalInnerHtml) {
   const apiUrl = 'https://api.openai.com/v1/chat/completions';
-  const apiKey = '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';
+  const apiKey = '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';
+
+
 
   const headers = {
     'Content-Type': 'application/json',
@@ -104,17 +141,20 @@ async function callOpenAIChatCompletion(userMessage) {
 
       
     const requestData = {
-      model: 'gpt-4',
+      model: model,
       messages: 
-        history
+        history,
+        stream:true,
+        temperature: 0.2
     };
 
 
-  try {
+  /* try {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(requestData),
+      stream:true
     });
 
     if (response.status === 200) {
@@ -127,7 +167,160 @@ async function callOpenAIChatCompletion(userMessage) {
     }
   } catch (error) {
     return `Error: ${error.message}`;
+  } */
+
+    document.getElementById('chat').innerHTML = document.getElementById('chat').innerHTML + `<div class = "ai-msg"><div class="loader">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div></div>`
+  document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(requestData)
+    });
+  
+    if (response.status === 200) {
+      const reader = response.body.getReader();
+      let result = '';
+      var final_string_json = '';
+      while (true) {
+        const { done, value } = await reader.read();
+  
+        if (done) {
+          
+          break;
+        }
+  
+        result = new TextDecoder('utf-8').decode(value);
+        result = result.split('\n\n')
+        result.pop()
+
+        for (var element of result) {
+          const cleaned_element = element.slice(6);
+         
+          var new_token = JSON.parse(cleaned_element).choices[0].delta.content;
+          console.log(new_token)
+          final_string_json += new_token;
+          if (new_token.includes("}")) {
+             if (final_string_json.includes("]")) {
+              const chatJson = JSON.parse(final_string_json);
+              const newMessageObject = chatJson[chatJson.length - 1];
+
+              console.log(newMessageObject)
+
+              document.getElementById("first-question").innerHTML = newMessageObject.content[0];
+              document.getElementById("second-question").innerHTML = newMessageObject.content[1];
+              document.getElementById("third-question").innerHTML = newMessageObject.content[2];
+
+              document.getElementById("send-icon-container").style.opacity = "100%"
+              document.getElementById("suggested-questions-headline").style.opacity = "100%"
+              document.getElementById("input-li").style.opacity = "100%"
+              document.getElementById("first-question").style.opacity = "100%"
+              document.getElementById("second-question").style.opacity = "100%"
+              document.getElementById("third-question").style.opacity = "100%"
+
+
+              document.getElementById("chat").innerHTML = document.getElementById("chat").innerHTML.slice(0, -147) 
+              console.log("done")
+              history.push({role: "assistant", content: final_string_json})
+              break;
+             }
+             console.log(final_string_json)
+             final_string_json = removeQuotesAndBackticksIfExist(final_string_json);
+             console.log(final_string_json.slice(0, -1) + "]")
+             const chatJson = JSON.parse(final_string_json.slice(0, -1) + "]");
+             const newMessageObject = chatJson[chatJson.length - 1];
+
+             if (newMessageObject.type == "text" && !newMessageObject.content.includes("div") && !Array.isArray(newMessageObject.content)) {
+              document.getElementById("chat").innerHTML =  originalInnerHtml + "<div class='ai-msg'> " + newMessageObject.content + "</div>" + `<div class = "ai-msg"><div class="loader">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div></div>`;
+            originalInnerHtml += "<div class='ai-msg'> " + newMessageObject.content + "</div>";
+
+            } else if ((newMessageObject.type == "html")) {
+              
+          
+
+
+             
+              const imageUrl = newMessageObject.imgUrl;
+              const title = newMessageObject.title;
+              const price = newMessageObject.price;
+              const year = newMessageObject.year;
+
+              // Create an HTML string with dynamic values using template literals
+              const yachtCardHTML = `
+              <div class='card yacht-card' style='width: 13rem;'> 
+                <img class='card-img-top yacht-image' src='${imageUrl}' > 
+                <div class='card-body'> 
+                  <h5 class='card-title'>${title}</h5> 
+                  <p class='card-text'>${price}&euro;
+                  <span class = "small-dot">•</span>
+                  ${year} 
+                  </p> 
+                  <a href='#' class='btn btn-primary see-more-btn'>See more </a> 
+                </div> 
+              </div>
+              `;
+                document.getElementById("chat").innerHTML = originalInnerHtml + yachtCardHTML + `<div class = "ai-msg"><div class="loader">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div></div>`;
+
+            
+              originalInnerHtml += yachtCardHTML;
+              
+            } else if (newMessageObject.type == "suggested") {
+        
+              document.getElementById("first-question").innerHTML = element.content[0];
+              document.getElementById("second-question").innerHTML = element.content[1];
+              document.getElementById("third-question").innerHTML = element.content[2];
+
+              document.getElementById("chat").innerHTML = originalInnerHtml;
+            }
+
+            setTimeout(function() {
+              document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+            }, 700)
+             
+          }
+
+          
+
+        }
+        
+        
+        
+      }
+
+      const chatJson = JSON.parse(final_string_json);
+      const newMessageObject = chatJson[chatJson.length - 1];
+
+      console.log(newMessageObject)
+
+      document.getElementById("first-question").innerHTML = newMessageObject.content[0];
+      document.getElementById("second-question").innerHTML = newMessageObject.content[1];
+      document.getElementById("third-question").innerHTML = newMessageObject.content[2];
+
+      document.getElementById("chat").innerHTML = document.getElementById("chat").innerHTML.slice(0, -147) 
+      
+   
+    } else {
+      return 'Error: Failed to retrieve response from OpenAI API';
+    }
+  } catch (error) {
+    return `Error: ${error.message}`;
   }
+
+
 }
 
 function fillTemplate(template, data) {
@@ -150,9 +343,16 @@ async function callGPT() {
 
   document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
-
   var query = document.getElementById("msg-input").value;
   document.getElementById("msg-input").value = "";
+
+
+  document.getElementById("send-icon-container").style.opacity = "30%"
+  document.getElementById("suggested-questions-headline").style.opacity = "30%"
+  document.getElementById("input-li").style.opacity = "30%"
+  document.getElementById("first-question").style.opacity = "30%"
+  document.getElementById("second-question").style.opacity = "30%"
+  document.getElementById("third-question").style.opacity = "30%"
 
   
   var fetchingDecisionQuery = ` You will be given an conversation between an AI chatbot on a yacht listing website and a human. 
@@ -163,21 +363,28 @@ async function callGPT() {
    If you already have info about the boat for the next question, you do not need to fetch the JSON again. 
    If you do not need to fetch data, then also write out the response to the user. 
    If you do need to fetch data, then write out the query to the vector database that will be used for similarity vector search (cosine similarity search). 
-   Along with the similarity serch query, also generate a filter object that contains metadata filters that I will use on pinecone for filtering.
+   Along with the similarity serch query, also generate a filter object that contains metadata filters that I will use on pinecone for filtering (for example which yacht brand the user is looking for)
    If an attribute is not mentioned in the query, do not add it to the JSON at all.
    Only generate metadata filters for pinecone.
    The available metadata filters (attributes) are:
-   1.  year 
-   2.  size (in meters)
-   3.  beam (in meters)
-   4.  price (in euros)
-   Example for fetching response: {"fetch":true,"dbQuery":"Princess V53","filter":{"size":{"$eq": 10},"year":2019}, "suggestedQuestions": [add three next suggested questions here]}. 
-   dbQuery is always only a string. The metadata filters should only be present in the filter object.
+   1.  brand (manufacturer)
+   2.  year 
+   3.  size (in meters)
+   4.  beam (in meters)
+   5.  price (in euros)
+   If someone mentions the brand (manufacturer) of the yacht in the query, include the brand name in the metadata filters too, not only in the dbQuery attribute.
+   Example for fetching response: {"fetch":true,"dbQuery":"Princess V53","filter":{"size":{"$eq": 10},"year":2019, "brand": {"$eq": "Fairline"}}, topK: {integer in range 1-3 that indicates how many yacht results to fetch from the vector database}, "suggestedQuestions": [add three next suggested questions here]}. 
+   If the manufacturer is mentioned in the query, always include the brand filter in the filter object!!!
+   Common manufacturers are: Fairline, Princess, Azimut, Cranchi.
+  
+   dbQuery is always only a string. The metadata filters should only be present in the filter object. If you understand that the user wants to see multiple yachts, you can set the topK filter to up to 3, but if he is searching for a specific yacht, you should set the topK attribute to 1.
    Example for not fetching response: {"fetch": false, "response": "This yacht was manufactured in 2021", "suggestedQuestions": [add three next suggested questions here]} 
    There is a third option. If the user asks you for some pictures of the boat, you can anwser with:
    {"fetch": false, "response": "["<img src='{img url}' class = 'single-img'>", "<img src='{img url}' class = 'single-img'>", ...]} 
-   You will be provided image urls in the data. Only render up to three images in the response. Take random images from the attribute otherImages, do not repeat the mainImg url.
+   You will be provided image urls in the data. Only render up to three images in the response. Do not forget to wrap the images in a list. If you do not wrap the image urls in a list, my code will break, so wrap them in a list.
    Do not forget to add the suggested next questions, always keep in mind to add exactly three suggestedQuestions.
+   These 3 questions will be rendered to the user as "suggested next questions".
+   Aim to only provide questions that you think you can give an anwser to from the data provided or that you can fetch new data from your vector database to anwser the question. (the data provided is data that is fetched from a a vector database with similarity search and metadata filtering, where each chunk is one yacht JSON object)
    If there are any numbers in the query, be sure to add the appropriate metadata filters.
    Never forget to add the fetch property. The fetch property is very important, do not miss adding it.
    If you are only providing the response, without fetching new data, focus on the last question in order to provide your anwser.
@@ -187,7 +394,9 @@ async function callGPT() {
    If the question is not related to yachts, say you do not know anything.`
 
   var historyCopy = history;
-  historyCopy.push({"role": "user", "content": query})
+
+  historyCopy.push({ role: "user", content: query })
+  
   historyCopy.slice(1).forEach(function(element) {
     // Access the elements of the array using the "element" parameter
 
@@ -198,9 +407,18 @@ async function callGPT() {
     }
 
   });
+  
+  var origin = document.getElementById("chat").innerHTML;
+  document.getElementById("chat").innerHTML = document.getElementById("chat").innerHTML +  `<div class = "ai-msg"><div class="loader">
+  <span></span>
+  <span></span>
+  <span></span>
+</div></div>`;
+
+document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
   const apiUrl = 'https://api.openai.com/v1/chat/completions';
-  const apiKey = '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';
+  const apiKey = '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';
 
   const headers = {
     'Content-Type': 'application/json',
@@ -208,7 +426,7 @@ async function callGPT() {
   };
 
   const requestDataInitial = {
-    model: 'gpt-4',
+    model: model,
     messages: [
       {"role": "user", content: fetchingDecisionQuery}
     ]
@@ -221,6 +439,9 @@ async function callGPT() {
       body: JSON.stringify(requestDataInitial),
     });
 
+    
+    document.getElementById("chat").innerHTML = origin;
+
   
     const dataInitial = await response2.json();
     var decision = dataInitial.choices[0].message.content
@@ -231,15 +452,19 @@ async function callGPT() {
 
     const decisionJson = JSON.parse(decision)
 
+
     console.log(decisionJson)
 
-    var originalInnerHtml = document.getElementById('chat').innerHTML;
-    if (decisionJson.fetch == false) {
 
+    var originalInnerHtml = document.getElementById('chat').innerHTML;
+  
+    if (decisionJson.fetch == false) {
+      
       var innerHtmlForChat = "<div class='ai-msg'> " + decisionJson.response + "</div>";
       if (decisionJson.response.includes("div")) {
         innerHtmlForChat = decisionJson.response;
       } else if (Array.isArray(decisionJson.response)) {
+        
         innerHtmlForChat = ""
         for (const img of decisionJson.response) {
           innerHtmlForChat += img;
@@ -249,6 +474,15 @@ async function callGPT() {
       document.getElementById("first-question").innerHTML = decisionJson.suggestedQuestions[0];
       document.getElementById("second-question").innerHTML = decisionJson.suggestedQuestions[1];
       document.getElementById("third-question").innerHTML = decisionJson.suggestedQuestions[2];
+
+      document.getElementById("send-icon-container").style.opacity = "100%"
+      document.getElementById("suggested-questions-headline").style.opacity = "100%"
+      document.getElementById("input-li").style.opacity = "100%"
+      document.getElementById("first-question").style.opacity = "100%"
+      document.getElementById("second-question").style.opacity = "100%"
+      document.getElementById("third-question").style.opacity = "100%"
+
+      history.push({role: "assistant", content: innerHtmlForChat})
       
       document.getElementById('chat').innerHTML = document.getElementById('chat').innerHTML + innerHtmlForChat;
       setTimeout(function() {
@@ -257,22 +491,12 @@ async function callGPT() {
     
       return 
     } else {
+    
       var innerHtmlForChat = "<div class='ai-msg'> " + "Give me a second to search for that." + "</div> ";
 
       setTimeout(function() {
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
       }, 300)
-    
-     
-      setTimeout(function() {
-        document.getElementById('chat').innerHTML = document.getElementById('chat').innerHTML + `<div class = "ai-msg"><div class="loader">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div></div>`
-    document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
-  }, 400)
-
 
       
       document.getElementById('chat').innerHTML = document.getElementById('chat').innerHTML + innerHtmlForChat;
@@ -283,7 +507,8 @@ async function callGPT() {
 
   var filters = decisionJson.filter;
 
-  const allowedAttributes = ["year", "size", "price", "beam"];
+
+  const allowedAttributes = ["year", "size", "price", "beam", "brand"];
 
   for (const key in filters) {
     if (!allowedAttributes.includes(key)) {
@@ -293,7 +518,7 @@ async function callGPT() {
 
   
   await fetchOpenAIRequest(decisionJson.dbQuery);
-  const pineconeResult = await fetchPineconeRequest(decisionJson.filter);
+  const pineconeResult = await fetchPineconeRequest(decisionJson.filter, decisionJson.topK);
 
   // Get a reference to the element you want to scroll (replace 'your-element-id' with the actual ID or selector)
 
@@ -301,17 +526,31 @@ async function callGPT() {
 
     // If a template is passed in, the input variables are inferred automatically from the template.
     // Example usage:
+
+var dataPass = '';
 const template = "Question: {question}. Data: {data}?";
+if (pineconeResult.matches[0]) {
+  dataPass += ', ' + pineconeResult.matches[0].metadata.text;
+}
+
+if (pineconeResult.matches[1]) {
+  dataPass += ', ' + pineconeResult.matches[1].metadata.text;
+} 
+if (pineconeResult.matches[2]) {
+  dataPass += ', ' + pineconeResult.matches[2].metadata.text;
+} 
+dataPass += ']'
+
 const data = {
   question: query,
-  data: pineconeResult.matches[0].metadata.text,
+  data: dataPass,
 };
 
 const userMessage = fillTemplate(template, data);
 
-  const response = await callOpenAIChatCompletion(userMessage);
+  const response = await callOpenAIChatCompletion(userMessage, originalInnerHtml);
 
-  var responseCleaned = removeQuotesAndBackticksIfExist(response)
+  /* var responseCleaned = removeQuotesAndBackticksIfExist(response)
 
   console.log(responseCleaned)
 
@@ -339,7 +578,7 @@ const userMessage = fillTemplate(template, data);
   document.getElementById('chat').innerHTML = originalInnerHtml + innerHtmlForChat;
   setTimeout(function() {
     document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
-  }, 700)
+  }, 700) */
   
 
  }
@@ -359,10 +598,21 @@ function clearHistory() {
     "content": systemPrompt
   }]
 
+  document.getElementById("first-question").innerHTML = "Fairline between 300 and 600k€?"
+  document.getElementById("second-question").innerHTML = "Princess yacht 13-16m?"
+  document.getElementById("third-question").innerHTML = "Galeon 430?"
+
+  document.getElementById("send-icon-container").style.opacity = "100%"
+  document.getElementById("suggested-questions-headline").style.opacity = "100%"
+  document.getElementById("input-li").style.opacity = "100%"
+  document.getElementById("first-question").style.opacity = "100%"
+  document.getElementById("second-question").style.opacity = "100%"
+  document.getElementById("third-question").style.opacity = "100%"
+
 
   setTimeout(function() {
     document.getElementById('chat').innerHTML = `<div class = "ai-msg">Hello, what yacht are you looking for?</div>`
-    }, 1000)
+     }, 1000)
 }
 document.getElementById("refresh-svg").addEventListener('click', clearHistory)
 
@@ -385,11 +635,11 @@ function thirdQuestion() {
 }
 
 document.getElementById("first-question").addEventListener('click', firstQuestion)
-console.log(document.getElementById("first-question"))
+
 document.getElementById("second-question").addEventListener('click', secondQuestion)
-console.log(document.getElementById("first-question"))
+
 document.getElementById("third-question").addEventListener('click', thirdQuestion)
-console.log(document.getElementById("first-question"))
+
 
 
 function isMobileDevice() {
@@ -399,11 +649,19 @@ function isMobileDevice() {
 
 if (isMobileDevice()) {
   // This code will run on mobile devices
+
   
   document.getElementById("input-li").style.marginLeft = "5px"
-  document.getElementById("chat").style.paddingBottom = "230px"
-  document.getElementById("suggested-questions").style.bottom = "66px"
+  /* document.getElementById("chat").style.paddingBottom = "230px" */
 
+  console.log(production)
+  if (production) {
+    document.getElementById("suggested-questions").style.bottom = "66px"
+
+    document.getElementById("chat").style.paddingBottom = "265px"
+
+  }
+  
 } else {
   // This code will run on desktop devices
   console.log('This is a desktop device');
@@ -413,3 +671,37 @@ if (window.innerWidth > 800) {
   // Add the data-simplebar attribute if the screen width is over 800px
   document.getElementById('suggested-questions').setAttribute('data-simplebar', '');
 }
+
+
+// Get a reference to your input element by its ID or any other selector
+const inputElement = document.getElementById('msg-input');
+
+// Add an event listener for the "keydown" event on the input element
+inputElement.addEventListener('keydown', function(event) {
+  // Check if the pressed key is "Enter" (key code 13)
+  if (event.key == 'Enter') {
+    // Your code to execute when Enter is pressed here
+    // For example, trigger a click event on a button with the id "your-button-id"
+    document.getElementById('send-icon-container').click();
+  }
+});
+
+
+document.getElementById("close-svg").addEventListener('click', function() {
+
+  document.getElementById("header").style.display = "none";
+  document.getElementById("chat").style.display = "none";
+  document.getElementById("widget").style.display = "none";
+  document.getElementById("footer").style.display = "none";
+
+})
+
+document.getElementById("opener").addEventListener('click', function() {
+
+  document.getElementById("header").style.display = "block";
+  document.getElementById("chat").style.display = "block";
+  document.getElementById("widget").style.display = "flex";
+  document.getElementById("footer").style.display = "flex";
+
+})
+

@@ -12,6 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+    <script src="config.js"></script>
+
     <link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
@@ -22,24 +24,32 @@
 <body>
    
     <script type="module" src="index.js"></script>
+    <div id = "header">
+        <li class="list-group-item py-2" style="border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;; display: flex; align-items: center;border:none;padding-right: 0.5em">
 
-   <div id = "widget" class = "card">
-        <div id = "header">
-            <li class="list-group-item py-2" style="border-bottom-left-radius: 0px;
-            border-bottom-right-radius: 0px;; display: flex; align-items: center;border:none;">
-
-                <img src="logo.jpg" id="logo" style="display: inline;">
-                <div>
-                    <h1 id="name" style="display: inline;font-weight: 600">YachtFinder</h1>
-                    <p id = "response-time-msg">Typically responds in under 10 seconds</p>
-                </div>
-               
-                <svg id ="refresh-svg " xmlns="http://www.w3.org/2000/svg" height="1em" style="margin-left:auto;margin-right: 10px;height: 20px;opacity: 88.5%" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M142.9 142.9c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8H463.5c0 0 0 0 0 0H472c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5c7.7-21.8 20.2-42.3 37.8-59.8zM16 312v7.6 .7V440c0 9.7 5.8 18.5 14.8 22.2s19.3 1.7 26.2-5.2l41.6-41.6c87.6 86.5 228.7 86.2 315.8-1c24.4-24.4 42.1-53.1 52.9-83.7c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.2 62.2-162.7 62.5-225.3 1L185 329c6.9-6.9 8.9-17.2 5.2-26.2s-12.5-14.8-22.2-14.8H48.4h-.7H40c-13.3 0-24 10.7-24 24z"/></svg>
-              </li>
+            <img src="logo.jpg" id="logo" style="display: inline;">
+            <div>
+                <h1 id="name" style="display: inline;font-weight: 600">YachtFinder</h1>
+                <p id = "response-time-msg">Typically responds in under 5 seconds</p>
+            </div>
+            
+            <svg id = "refresh-svg" xmlns="http://www.w3.org/2000/svg" style="height: 25px;margin-left: auto;margin-right:10px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
               
-        </div>
+              <svg id = "close-svg" style="height: 30px;margin-top: 7px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              
+              
+    </div>
+   <div id = "widget" class = "card">
+        
         <div id = "chat" >
-            <div class = "ai-msg">Hello, what yacht are you looking for?</div>
+            <!-- <div class = "ai-msg">Hello, what yacht are you looking for?</div>
               <div class = "user-msg">Im looking for a Princess V53, do you have one available? </div>
             <div class = "ai-msg">Great choice! Yes we have one available. </div>
             
@@ -68,7 +78,10 @@
         </div>
         <div class = "ai-msg">Would you like to learn more, or do you have some other yacht brands you prefer? </div>
         <div class = "user-msg">Please give me who to contact about this boat.</div> 
- 
+  -->
+
+
+  <div class="ai-msg">Hello, what yacht are you looking for?</div><div class="user-msg"> Fairline between 300 and 600k€?</div><div class="ai-msg"> Give me a second to search for that.</div> <div class="ai-msg"> We have a Fairline F//33 that fits your budget. Here are the details:</div><div class="card yacht-card" style="width: 13rem;"><img class="card-img-top yacht-image" src="https://firebasestorage.googleapis.com/v0/b/approved-boats.appspot.com/o/Xrgg8rB7BVWN7TUViwXrGjvTwHM2%2F1678272360908Fairline%20F%2F33%2FmainImg%2F1678272360908-F33%20Exterior%205734-1200x857-eb97591.jpg?alt=media&amp;token=f6cb7837-5ba9-4420-9ab8-4a2358698561"><div class="card-body"><h5 class="card-title">Fairline F//33</h5><p class="card-text">580000€  <span class = "small-dot">•</span> 2023</p><a href="#" class="btn btn-primary see-more-btn">See more </a></div></div><div class="user-msg"> interior photos?</div><img src="https://firebasestorage.googleapis.com/v0/b/approved-boats.appspot.com/o/Xrgg8rB7BVWN7TUViwXrGjvTwHM2%2F1678272360908Fairline%20F%2F33%2F1678272371766-F33%20Interior%209331480-1200x899-8313029.jpg?alt=media&amp;token=a3e69232-081d-4f4b-8abc-7dcf9e640795" class="single-img"><div class="user-msg"> engines?</div><div class="ai-msg"> The yacht is powered by 2x Volvo Penta VB- 435 engines.</div><div class="user-msg"> exterior photos?</div><img src="https://firebasestorage.googleapis.com/v0/b/approved-boats.appspot.com/o/Xrgg8rB7BVWN7TUViwXrGjvTwHM2%2F1678272360908Fairline%20F%2F33%2F1678272363478-F33%20Exterior%205664-1200x857-eb97591.jpg?alt=media&amp;token=f79270be-8303-4f60-81bf-f4542cf48e48" class="single-img"><img src="https://firebasestorage.googleapis.com/v0/b/approved-boats.appspot.com/o/Xrgg8rB7BVWN7TUViwXrGjvTwHM2%2F1678272360908Fairline%20F%2F33%2F1678272366363-F33%20Exterior%205734-1200x857-eb97591.jpg?alt=media&amp;token=da4c09a0-fac0-47d6-8baa-1052e02504cb" class="single-img"><img src="https://firebasestorage.googleapis.com/v0/b/approved-boats.appspot.com/o/Xrgg8rB7BVWN7TUViwXrGjvTwHM2%2F1678272360908Fairline%20F%2F33%2F1678272368378-F33%20Exterior%209330924-1200x899-8313029.jpg?alt=media&amp;token=f55b4051-380c-4ab7-8e27-d6a38bb2ab0f" class="single-img">
         </div>
         
 
@@ -82,12 +95,18 @@
 
 
 <div id = "footer" style="display: flex;justify-content: space-between;padding-bottom: 0px;align-items: flex-end;">
+    <p id = "suggested-questions-headline">SUGGESTED QUESTIONS</p>
     <div id = "suggested-questions" >
-        <span class = "suggested-question " id = "first-question">Fairline between 300 and 400k€?</span>
-        <span class = "suggested-question" id = "second-question">Princess yacht below 13 meter?</span>
+        
+        <span class = "suggested-question " id = "first-question">Fairline yacht between 300 and 600k€?</span>
+        <span class = "suggested-question" id = "second-question">Princess yacht between 13-16m?</span>
         <span class = "suggested-question" id = "third-question">Galeon 430?</span>   
     </div>
-    <li class="list-group-item py-1   ms-0 mb-0" id = "input-li" style="margin-right: 10px;background-color: rgba(255, 255, 255, 0.166);  border-radius: 15px;border: 1px solid rgba(0, 0, 0, 0.173);display: flex; align-items: center;width: 100%;padding-left: 10px;margin-left: 0px;transform: translateY(-15px);"><input type="text" placeholder="Ask me anything.." id = "msg-input">  </li> 
-    <div id = "send-icon-container" style="transform: translateY(-15px)"> <svg xmlns="http://www.w3.org/2000/svg" height=".85em" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#fafafa}</style><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg> </div>
+    <li class="list-group-item py-1   ms-0 mb-0" id = "input-li" style="margin-left: 5px !important;margin-right: 8px;background-color: rgba(255, 255, 255, 0.166);  border-radius: 15px;border: 1px solid rgba(0, 0, 0, 0.2);display: flex; align-items: center;width: 100%;padding-left: 10px;margin-left: 0px;transform: translateY(-15px);"><input type="text" placeholder="Ask me anything.." id = "msg-input">  </li> 
+    <div id = "send-icon-container" style="transform: translate(4px, -17px)"> <svg xmlns="http://www.w3.org/2000/svg" height=".85em" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#fafafa}</style><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg> </div>
+</div>
+
+<div id = "opener-div" style="width: 80px;position:fixed; bottom: 20px; right: 0px;display: flex;justify-content: center;">
+    <img src="logo.jpg" id = "opener" style="border-radius: 50%; width: 50px; height:auto;transform: translateX(5px);" >
 </div>
    
