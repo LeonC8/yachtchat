@@ -1,4 +1,5 @@
-const model = "gpt-3.5-turbo-16k"
+const model = "gpt-4"
+const key = '4ty0OxJEPa4XFZdF6urrT3BlbkFJb6H9XYzSwryf3gKSOumH'
 
 const systemPrompt = `You are a helpful chatbot assistant on a yacht listing website. Anwser short. 
 Always try to anwser as short as possible. 
@@ -11,14 +12,17 @@ If you think it is appropriate, you should render the image of the yacht or yach
 You do this by providing me with a list of attributes that I use to render the card. 
 The template for the list is: [{imageUrl(taken from mainImg attribute in JSON)}, {yacht_name}, {price}, {year}]
  Do not render the card and image any other way then with this template list. 
- Anwser very concise. 
- Anwser with a list of JSON objects. Only anwser with the list of JSON objects and never anythign else. 
- This is the template for your anwser: '[{\"type\": 'text', \"content\": 'some content'}, {\"type\": 'html', "imgUrl": 'url', "title": 'title', "price": 'price', "year": 'year'}, {\"type\": 'text', content: 'some content'}, ...]'
+ Also, if ther user is asking for more images of a yacht, you can render them with an object inside the list like {\"type\": 'images',\"img1\": '', \"img2\": '',\"img3\": ''} (provide 1-3 images, depending on how many you are given available.)
+ Only provide these 3 images at attributes, not in a list!
+ Anwser very concise. If the data provided is not enough to anwser, say you do not know in a polite way.
+ Anwser with a list of JSON objects. Only anwser with the list of JSON objects and never anything else. 
+ This is the template for your anwser: '[{\"type\": 'text', \"content\": 'some content'}, {\"type\": 'html', "imgUrl": 'url', "title": 'yacht name goes here', "price": 'price', "year": 'year'}, {\"type\": 'text', content: 'some content'},  {\"type\": 'images',\"img1\": '', \"img2\": '',\"img3\": ''} ...]'
   Every single time at the end of the list, add another list with 3 suggested next questions for the user. 
   Do not forget to add these suggested questions in a list. These 3 questions will be rendered to the user as "suggested next questions".
   Aim to only provide questions that you think you can give an anwser to from the data provided or that you can fetch new data from your vector database to anwser the question. (the data provided is data that is fetched from a a vector database with similarity search and metadata filtering, where each chunk is one yacht JSON object)
   The template is: {\"type\": 'suggested', \"content\": [question1, question2, question3]}  Add exactly 3 of them. Do not forget to close the last object with '}'. 
-  If you are adding an object with suggested anwsers, the type MUST be 'suggested'. 
+  If you are adding an object with suggested anwsers, the type MUST be 'suggested'. Keep in mind, the suggested question are questions that the user can submit next, he is asking us these questins, these are not questions from us to him.
+Never forget to add the suggested questions, always add them!!! Keep in mind, the questions are suggested to the USER to be submitted as next questions, these are not quesions that we ask the user!
   Do not say anything before or after! Never deviate from the JSON template. 
   Never forget to wrap the message objects in a list. 
   You can only put html and text object types one after another, like it is a conversation. 
@@ -56,7 +60,7 @@ function removeQuotesAndBackticksIfExist(inputString) {
   }
 
 const API_KEY = 'a636c203-e59e-4d56-a1d8-e884ac4baf5b';
-const OPENAI_API_KEY = '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'; // Replace with your actual API key
+const OPENAI_API_KEY = "sk-" + key; // Replace with your actual API key
 let vector = [];
 
 var history = [{
@@ -128,7 +132,7 @@ async function fetchPineconeRequest(metadataFilters, topK) {
 
 async function callOpenAIChatCompletion(userMessage, originalInnerHtml) {
   const apiUrl = 'https://api.openai.com/v1/chat/completions';
-  const apiKey = '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';
+  const apiKey = "sk-" + key;
 
 
 
@@ -145,7 +149,7 @@ async function callOpenAIChatCompletion(userMessage, originalInnerHtml) {
       messages: 
         history,
         stream:true,
-        temperature: 0.2
+        temperature: 1
     };
 
 
@@ -205,38 +209,53 @@ async function callOpenAIChatCompletion(userMessage, originalInnerHtml) {
          
           var new_token = JSON.parse(cleaned_element).choices[0].delta.content;
           console.log(new_token)
+
+          if (typeof new_token === 'undefined') {
+            final_string_json = removeQuotesAndBackticksIfExist(final_string_json)
+            console.log(final_string_json)
+            const chatJsonEnd = JSON.parse(final_string_json);
+            const newMessageObject = chatJsonEnd[chatJsonEnd.length - 1];
+
+            console.log(newMessageObject)
+
+            document.getElementById("first-question").innerHTML = newMessageObject.content[0];
+            document.getElementById("second-question").innerHTML = newMessageObject.content[1];
+            document.getElementById("third-question").innerHTML = newMessageObject.content[2];
+
+            document.getElementById("send-icon-container").style.opacity = "100%"
+            document.getElementById("suggested-questions-headline").style.opacity = "100%"
+            document.getElementById("input-li").style.opacity = "100%"
+            document.getElementById("first-question").style.opacity = "100%"
+            document.getElementById("second-question").style.opacity = "100%"
+            document.getElementById("third-question").style.opacity = "100%"
+
+
+            document.getElementById("chat").innerHTML = document.getElementById("chat").innerHTML.slice(0, -147) 
+            console.log("done")
+            history.push({role: "assistant", content: final_string_json})
+            break;
+          return;
+        }
+
           final_string_json += new_token;
+          
           if (new_token.includes("}")) {
-             if (final_string_json.includes("]")) {
-              const chatJson = JSON.parse(final_string_json);
-              const newMessageObject = chatJson[chatJson.length - 1];
 
-              console.log(newMessageObject)
-
-              document.getElementById("first-question").innerHTML = newMessageObject.content[0];
-              document.getElementById("second-question").innerHTML = newMessageObject.content[1];
-              document.getElementById("third-question").innerHTML = newMessageObject.content[2];
-
-              document.getElementById("send-icon-container").style.opacity = "100%"
-              document.getElementById("suggested-questions-headline").style.opacity = "100%"
-              document.getElementById("input-li").style.opacity = "100%"
-              document.getElementById("first-question").style.opacity = "100%"
-              document.getElementById("second-question").style.opacity = "100%"
-              document.getElementById("third-question").style.opacity = "100%"
-
-
-              document.getElementById("chat").innerHTML = document.getElementById("chat").innerHTML.slice(0, -147) 
-              console.log("done")
-              history.push({role: "assistant", content: final_string_json})
-              break;
-             }
+            if (final_string_json.includes("suggested")) {
+              continue;
+            }
+             
              console.log(final_string_json)
              final_string_json = removeQuotesAndBackticksIfExist(final_string_json);
-             console.log(final_string_json.slice(0, -1) + "]")
-             const chatJson = JSON.parse(final_string_json.slice(0, -1) + "]");
+              var chatJson = {};
+              const lastOccurenceOfBrace = final_string_json.lastIndexOf("}");
+              chatJson = JSON.parse(final_string_json.substring(0, lastOccurenceOfBrace + 1) + "]");
+             
+             
              const newMessageObject = chatJson[chatJson.length - 1];
+             console.log(newMessageObject)
 
-             if (newMessageObject.type == "text" && !newMessageObject.content.includes("div") && !Array.isArray(newMessageObject.content)) {
+             if (newMessageObject.type == "text") {
               document.getElementById("chat").innerHTML =  originalInnerHtml + "<div class='ai-msg'> " + newMessageObject.content + "</div>" + `<div class = "ai-msg"><div class="loader">
               <span></span>
               <span></span>
@@ -246,10 +265,6 @@ async function callOpenAIChatCompletion(userMessage, originalInnerHtml) {
 
             } else if ((newMessageObject.type == "html")) {
               
-          
-
-
-             
               const imageUrl = newMessageObject.imgUrl;
               const title = newMessageObject.title;
               const price = newMessageObject.price;
@@ -285,6 +300,20 @@ async function callOpenAIChatCompletion(userMessage, originalInnerHtml) {
               document.getElementById("third-question").innerHTML = element.content[2];
 
               document.getElementById("chat").innerHTML = originalInnerHtml;
+            } else if (newMessageObject.type == "images") {
+              var innerHTML = "";
+              if (newMessageObject.img1) {
+                innerHTML += `<img src='${newMessageObject.img1}' class = 'single-img'>`;
+              } 
+              if (newMessageObject.img2) {
+                innerHTML += `<img src='${newMessageObject.img2}' class = 'single-img'>`;
+              }
+              if (newMessageObject.img3) {
+                innerHTML += `<img src='${newMessageObject.img3}' class = 'single-img'>`;
+              }
+
+              document.getElementById("chat").innerHTML = originalInnerHtml + innerHTML;
+              originalInnerHtml += document.getElementById("chat").innerHTML;
             }
 
             setTimeout(function() {
@@ -301,7 +330,7 @@ async function callOpenAIChatCompletion(userMessage, originalInnerHtml) {
         
       }
 
-      const chatJson = JSON.parse(final_string_json);
+      chatJson = JSON.parse(final_string_json);
       const newMessageObject = chatJson[chatJson.length - 1];
 
       console.log(newMessageObject)
@@ -310,14 +339,14 @@ async function callOpenAIChatCompletion(userMessage, originalInnerHtml) {
       document.getElementById("second-question").innerHTML = newMessageObject.content[1];
       document.getElementById("third-question").innerHTML = newMessageObject.content[2];
 
-      document.getElementById("chat").innerHTML = document.getElementById("chat").innerHTML.slice(0, -147) 
+      document.getElementById("chat").innerHTML = originalInnerHtml
       
    
     } else {
       return 'Error: Failed to retrieve response from OpenAI API';
     }
   } catch (error) {
-    return `Error: ${error.message}`;
+    console.log( `Error: ${error.message}`);
   }
 
 
@@ -363,6 +392,8 @@ async function callGPT() {
    If you already have info about the boat for the next question, you do not need to fetch the JSON again. 
    If you do not need to fetch data, then also write out the response to the user. 
    If you do need to fetch data, then write out the query to the vector database that will be used for similarity vector search (cosine similarity search). 
+   You can either choose to fetch "detailed" data or just general data. When you only need the general data for the response (year, price, main image url, yacht name), then set the detailed attribute to false, otherwise if you need the detailed data for the response (equipment information, interior and exterior images...), then set this detailed filter to true.
+    ALWAYS provide me with the "detailed" metadata attribute value. Just set it to "detailed": true, or "detailed":false.
    Along with the similarity serch query, also generate a filter object that contains metadata filters that I will use on pinecone for filtering (for example which yacht brand the user is looking for)
    If an attribute is not mentioned in the query, do not add it to the JSON at all.
    Only generate metadata filters for pinecone.
@@ -372,21 +403,25 @@ async function callGPT() {
    3.  size (in meters)
    4.  beam (in meters)
    5.  price (in euros)
+   6. detailed (false or true)
    If someone mentions the brand (manufacturer) of the yacht in the query, include the brand name in the metadata filters too, not only in the dbQuery attribute.
-   Example for fetching response: {"fetch":true,"dbQuery":"Princess V53","filter":{"size":{"$eq": 10},"year":2019, "brand": {"$eq": "Fairline"}}, topK: {integer in range 1-3 that indicates how many yacht results to fetch from the vector database}, "suggestedQuestions": [add three next suggested questions here]}. 
+   Example for fetching response: {"fetch":true,"dbQuery":"Princess V53","filter":{"size":{"$eq": 10},"year":2019, "brand": {"$eq": "Fairline"}}, "detailed": true, topK: {integer in range 1-6 that indicates how many yacht results to fetch from the vector database}, "suggestedQuestions": [add three next suggested questions here]}. 
+   Keep in mind, the suggested question are questions that the user can submit next, he is asking us these questins, these are not questions from us to him.
    If the manufacturer is mentioned in the query, always include the brand filter in the filter object!!!
-   Common manufacturers are: Fairline, Princess, Azimut, Cranchi.
+   Common manufacturers are: Fairline, Princess, Azimut, Cranchi. When writing out the brand, be careful to write it exactly like I did, also be careful to capitalize it.
   
-   dbQuery is always only a string. The metadata filters should only be present in the filter object. If you understand that the user wants to see multiple yachts, you can set the topK filter to up to 3, but if he is searching for a specific yacht, you should set the topK attribute to 1.
+   dbQuery is always only a string. The metadata filters should only be present in the filter object. If you understand that the user wants to see multiple yachts, you can set the topK filter to up to 6, but if he is searching for a specific yacht, you should set the topK attribute to 1.
    Example for not fetching response: {"fetch": false, "response": "This yacht was manufactured in 2021", "suggestedQuestions": [add three next suggested questions here]} 
    There is a third option. If the user asks you for some pictures of the boat, you can anwser with:
    {"fetch": false, "response": "["<img src='{img url}' class = 'single-img'>", "<img src='{img url}' class = 'single-img'>", ...]} 
+   If you do are missing urls to render the images or if you are missing any other data that the user is asking for, perform a detailed fetch.
    You will be provided image urls in the data. Only render up to three images in the response. Do not forget to wrap the images in a list. If you do not wrap the image urls in a list, my code will break, so wrap them in a list.
    Do not forget to add the suggested next questions, always keep in mind to add exactly three suggestedQuestions.
    These 3 questions will be rendered to the user as "suggested next questions".
    Aim to only provide questions that you think you can give an anwser to from the data provided or that you can fetch new data from your vector database to anwser the question. (the data provided is data that is fetched from a a vector database with similarity search and metadata filtering, where each chunk is one yacht JSON object)
+   Do not deviate from the given JSON formats, always include all the attributes exactly as mentioned!
    If there are any numbers in the query, be sure to add the appropriate metadata filters.
-   Never forget to add the fetch property. The fetch property is very important, do not miss adding it.
+   Never forget to add the fetch and topK properties. The fetch and topK properties are very important, do not miss adding it.
    If you are only providing the response, without fetching new data, focus on the last question in order to provide your anwser.
    Always only anwser the last submitted question by the user. If the user is asking a follow up question, do not query the data once again. Be very focused on providing the user anwsers that make sense.
    Focus the most on anwsering the last question.
@@ -396,6 +431,8 @@ async function callGPT() {
   var historyCopy = history;
 
   historyCopy.push({ role: "user", content: query })
+
+  console.log(historyCopy)
   
   historyCopy.slice(1).forEach(function(element) {
     // Access the elements of the array using the "element" parameter
@@ -405,6 +442,8 @@ async function callGPT() {
     } else {
       fetchingDecisionQuery += "AI: " + element.content
     }
+
+   
 
   });
   
@@ -418,7 +457,7 @@ async function callGPT() {
 document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
   const apiUrl = 'https://api.openai.com/v1/chat/completions';
-  const apiKey = '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';
+  const apiKey = key;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -454,6 +493,8 @@ document.getElementById('chat').scrollTop = document.getElementById('chat').scro
 
 
     console.log(decisionJson)
+
+    
 
 
     var originalInnerHtml = document.getElementById('chat').innerHTML;
@@ -507,6 +548,8 @@ document.getElementById('chat').scrollTop = document.getElementById('chat').scro
 
   var filters = decisionJson.filter;
 
+  const detailed =  decisionJson.detailed;
+  console.log(detailed)
 
   const allowedAttributes = ["year", "size", "price", "beam", "brand"];
 
@@ -520,24 +563,60 @@ document.getElementById('chat').scrollTop = document.getElementById('chat').scro
   await fetchOpenAIRequest(decisionJson.dbQuery);
   const pineconeResult = await fetchPineconeRequest(decisionJson.filter, decisionJson.topK);
 
-  // Get a reference to the element you want to scroll (replace 'your-element-id' with the actual ID or selector)
-
-  
-
-    // If a template is passed in, the input variables are inferred automatically from the template.
-    // Example usage:
 
 var dataPass = '';
 const template = "Question: {question}. Data: {data}?";
 if (pineconeResult.matches[0]) {
-  dataPass += ', ' + pineconeResult.matches[0].metadata.text;
+
+  if (detailed) {
+    dataPass += ', ' + pineconeResult.matches[0].metadata.text;
+  } else {
+    console.log("UNDETAILED DATA")
+    const object = pineconeResult.matches[0];
+    
+    dataPass += ', ' + JSON.stringify(
+      {
+        "yacht_name": object.metadata.yacht_name,
+        "price": object.metadata.price,
+        "mainImg": object.metadata.mainImg,
+        "year": object.metadata.year
+      }
+    );
+    console.log(dataPass)
+
+  }
+
 }
 
 if (pineconeResult.matches[1]) {
-  dataPass += ', ' + pineconeResult.matches[1].metadata.text;
+  if (detailed) {
+    dataPass += ', ' + pineconeResult.matches[1].metadata.text;
+  } else {
+    const object = pineconeResult.matches[1];
+    dataPass += ', ' + JSON.stringify(
+      {
+        "yacht_name": object.metadata.yacht_name,
+        "price": object.metadata.price,
+        "mainImg": object.metadata.mainImg,
+        "year": object.metadata.year
+      }
+    );
+  }
 } 
 if (pineconeResult.matches[2]) {
-  dataPass += ', ' + pineconeResult.matches[2].metadata.text;
+  if (detailed) {
+    dataPass += ', ' + pineconeResult.matches[2].metadata.text;
+  } else {
+    const object = pineconeResult.matches[2];
+    dataPass += ', ' + JSON.stringify(
+      {
+        "yacht_name": object.metadata.yacht_name,
+        "price": object.metadata.price,
+        "mainImg": object.metadata.mainImg,
+        "year": object.metadata.year
+      }
+    );
+  }
 } 
 dataPass += ']'
 
