@@ -7,7 +7,7 @@ Only provide the necessary information.
 Prioritize rendering a visual image over writing more text. 
 You will answer questions that customers ask about the yachts on our platform. 
 For each question, I will give you the needed data taken from our database. 
-If you get no data provided, just say: 'Im sorry, but it seems like we do not have a yacht with those features available.' 
+If you get no data provided, just say: [{\"type\": \"text\", \"content\": \"Im sorry, but it seems like we currently do not have a yacht that fits your criteria.\"}, {\"type\": \"suggested\", \"content\": [question1, question2, question3]}]
 If you think it is appropriate, you should render the image of the yacht or yachts in an html card. 
 You do this by providing me with a list of attributes that I use to render the card. 
 The template for the list is: [{imageUrl(taken from mainImg attribute in JSON)}, {yacht_name}, {price}, {year}]
@@ -16,15 +16,17 @@ The template for the list is: [{imageUrl(taken from mainImg attribute in JSON)},
  Only provide these 3 images at attributes, not in a list!
  Anwser very concise. If the data provided is not enough to anwser, say you do not know in a polite way.
  Anwser with a list of JSON objects. Only anwser with the list of JSON objects and never anything else. 
- This is the template for your anwser: '[{\"type\": 'text', \"content\": 'some content'}, {\"type\": 'html', "imgUrl": 'url', "title": 'yacht name goes here', "price": 'price', "year": 'year'}, {\"type\": 'text', content: 'some content'},  {\"type\": 'images',\"img1\": '', \"img2\": '',\"img3\": ''} ...]'
+ This is the template for your anwser: [{\"type\": \"text\", \"content\": \"some content\"}, {\"type\": \"html\", "imgUrl": \"url\", "title": \"yacht name goes here\", "price": \"price\", "year": \"year\"}, {\"type\": \"text\", content: \"some content\"},  {\"type\": \"images\",\"img1\": \"\", \"img2\": \"\",\"img3\": \"\"} ...]
   Every single time at the end of the list, add another list with 3 suggested next questions for the user. 
   Do not forget to add these suggested questions in a list. These 3 questions will be rendered to the user as "suggested next questions".
+  Example of follow up questions are: "Where is this yacht located?", "Can I see interior photos?", "Can you offer me other yachts in this price range but bigger?".
   Aim to only provide questions that you think you can give an anwser to from the data provided or that you can fetch new data from your vector database to anwser the question. (the data provided is data that is fetched from a a vector database with similarity search and metadata filtering, where each chunk is one yacht JSON object)
-  The template is: {\"type\": 'suggested', \"content\": [question1, question2, question3]}  Add exactly 3 of them. Do not forget to close the last object with '}'. 
-  If you are adding an object with suggested anwsers, the type MUST be 'suggested'. Keep in mind, the suggested question are questions that the user can submit next, he is asking us these questins, these are not questions from us to him.
+  The template is: {\"type\": \"suggested\", \"content\": [question1, question2, question3]}  Add exactly 3 of them. Do not forget to close the last object with '}'. 
+  If you are adding an object with suggested anwsers, the type MUST be 'suggested'. 
+  Keep in mind, the suggested question are questions that the user can submit next, he is asking us these questins, these are not questions from us to him.
 Never forget to add the suggested questions, always add them!!! Keep in mind, the questions are suggested to the USER to be submitted as next questions, these are not quesions that we ask the user!
   Do not say anything before or after! Never deviate from the JSON template. 
-  Never forget to wrap the message objects in a list. 
+  Never forget to wrap the message objects in a list.  ALWAYS WRITE OUT THE SUGGESTED QUESTIONS. THE SUGGESTED QUESIONS MUST GO INSIDE THE MAIN GENERAL JSON LIST.
   You can only put html and text object types one after another, like it is a conversation. 
   Keep in mind, all of the text and and html objects have to then once again be wrapped in one big list. 
   When you are rendering cards, each card must be in its seperate JSON object. 
@@ -249,6 +251,7 @@ async function callOpenAIChatCompletion(userMessage, originalInnerHtml) {
              final_string_json = removeQuotesAndBackticksIfExist(final_string_json);
               var chatJson = {};
               const lastOccurenceOfBrace = final_string_json.lastIndexOf("}");
+              console.log(final_string_json.substring(0, lastOccurenceOfBrace + 1) + "]")
               chatJson = JSON.parse(final_string_json.substring(0, lastOccurenceOfBrace + 1) + "]");
              
              
@@ -409,7 +412,7 @@ async function callGPT() {
    Keep in mind, the suggested question are questions that the user can submit next, he is asking us these questins, these are not questions from us to him.
    If the manufacturer is mentioned in the query, always include the brand filter in the filter object!!!
    Common manufacturers are: Fairline, Princess, Azimut, Cranchi. When writing out the brand, be careful to write it exactly like I did, also be careful to capitalize it.
-  
+  The only 4 options for the brand filter are "Fairline", "Princess", "Azimut", "Cranchi", "Ferretti".
    dbQuery is always only a string. The metadata filters should only be present in the filter object. If you understand that the user wants to see multiple yachts, you can set the topK filter to up to 6, but if he is searching for a specific yacht, you should set the topK attribute to 1.
    Example for not fetching response: {"fetch": false, "response": "This yacht was manufactured in 2021", "suggestedQuestions": [add three next suggested questions here]} 
    There is a third option. If the user asks you for some pictures of the boat, you can anwser with:
@@ -417,7 +420,8 @@ async function callGPT() {
    If you do are missing urls to render the images or if you are missing any other data that the user is asking for, perform a detailed fetch.
    You will be provided image urls in the data. Only render up to three images in the response. Do not forget to wrap the images in a list. If you do not wrap the image urls in a list, my code will break, so wrap them in a list.
    Do not forget to add the suggested next questions, always keep in mind to add exactly three suggestedQuestions.
-   These 3 questions will be rendered to the user as "suggested next questions".
+   These 3 questions will be rendered to the user as "suggested next questions".   Example of follow up questions are: "Where is this yacht located?", "Can I see interior photos?", "Can you offer me other yachts in this price range but bigger?".
+
    Aim to only provide questions that you think you can give an anwser to from the data provided or that you can fetch new data from your vector database to anwser the question. (the data provided is data that is fetched from a a vector database with similarity search and metadata filtering, where each chunk is one yacht JSON object)
    Do not deviate from the given JSON formats, always include all the attributes exactly as mentioned!
    If there are any numbers in the query, be sure to add the appropriate metadata filters.
@@ -457,7 +461,7 @@ async function callGPT() {
 document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
   const apiUrl = 'https://api.openai.com/v1/chat/completions';
-  const apiKey = key;
+  const apiKey ="sk-" +  key;
 
   const headers = {
     'Content-Type': 'application/json',

@@ -426,4 +426,6 @@ p {
     margin-right: 5px;
   }
 
- 
+ svg {
+    fill:none !
+ }
