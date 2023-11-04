@@ -781,10 +781,17 @@ document.getElementById("close-svg").addEventListener('click', function() {
 
 document.getElementById("opener").addEventListener('click', function() {
 
-  document.getElementById("header").style.display = "block";
-  document.getElementById("chat").style.display = "block";
-  document.getElementById("widget").style.display = "flex";
-  document.getElementById("footer").style.display = "flex";
+  if (document.getElementById("header").style.display == "none") {
+    document.getElementById("header").style.display = "block";
+    document.getElementById("chat").style.display = "block";
+    document.getElementById("widget").style.display = "flex";
+    document.getElementById("footer").style.display = "flex";
+  } else {
+    document.getElementById("header").style.display = "none";
+    document.getElementById("chat").style.display = "none";
+    document.getElementById("widget").style.display = "none";
+    document.getElementById("footer").style.display = "none";
+  }
 
 })
 

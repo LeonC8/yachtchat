@@ -3,11 +3,10 @@ body {
     color: rgba(0, 0, 0, 0.92)
 }
 
-html, body {
-    overflow: hidden;
-  }
+
 
 #widget {
+    font-family: 'Inter', sans-serif !important;
     height:100%;
     width: 100%;
         display:flex;
@@ -17,10 +16,12 @@ html, body {
     right: 0%;
     position: fixed;
     bottom: 0;
-    
+    border-radius: 0px !important;
+    z-index: 5;
 }
 
 #header {
+    font-family: 'Inter', sans-serif !important;
     background: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
     backdrop-filter: blur(50px);
     -webkit-backdrop-filter: blur(50px);
@@ -35,6 +36,7 @@ html, body {
     position:fixed;
 top: 0;
 max-width: 800px;
+z-index: 15
 
     
 }
@@ -44,8 +46,8 @@ max-width: 800px;
 }
 
 
-
 #footer {
+    font-family: 'Inter', sans-serif !important;
     position:fixed;
     bottom: 0; /* Adjust for the safe area at the bottom */
     right: 0px;
@@ -429,3 +431,15 @@ p {
  svg {
     fill:none !
  }
+
+#mynav {
+    z-index:3 !important;
+}
+
+svg {
+    cursor: pointer;
+}
+
+#opener {
+    cursor: pointer;
+}
